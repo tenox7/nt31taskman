@@ -235,6 +235,16 @@ The GNU build uses its own entry point and links without the C runtime. The sour
 
 An alternative `build-ms.cmd` is included for an **x86 NT 3.1 SDK / contemporary Microsoft compiler environment**. That route uses the compiler's normal runtime startup and remains untested. A modern Microsoft runtime should not be assumed to support NT 3.x.
 
+### PINT 3.5 (Windows NT 3.5 on the Raspberry Pi)
+
+PINT 3.5 runs it as its Task List. The Makefile builds it with nmake and the PINT 3.5 SDK in Docker ([tenox7/pint35sdk](https://hub.docker.com/r/tenox7/pint35sdk); its page tells how to set it up once):
+
+```sh
+docker run --rm -v msvc-arm32:/opt/msvc -v "$PWD":/src tenox7/pint35sdk nmake NODEBUG=1
+```
+
+Output: `taskman.exe`, for ARM. The releases have it as `taskman-pint35-arm.exe`.
+
 ### Optional tests
 
 The counter arithmetic and process-record decoder can be tested on the build host:

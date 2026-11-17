@@ -19,19 +19,33 @@ static void tasklistCommand(char *command)
     for (i=0;path[i];++i) if (path[i]==' ') space=1;
     wsprintfA(command,space?"\"%s\" /tasklist":"%s /tasklist",path);
 }
+/* Installed when Taskman starts this program with /tasklist: by its path, as
+ * toggleTasklist writes it, or by a name on the search path (taskman.exe
+ * /tasklist). The program is split from its arguments as Program Manager's
+ * ExecProgram does. */
 static int tasklistInstalled(void)
 {
     HKEY key;
-    char value[MAX_PATH+16], command[MAX_PATH+16];
-    DWORD size=sizeof(value)-1, type=0;
+    char value[MAX_PATH+16], self[MAX_PATH], found[MAX_PATH], *program, *arguments, *file, separator;
+    DWORD size=sizeof(value)-1, type=0, n;
     LONG status;
     if (RegOpenKeyExA(HKEY_LOCAL_MACHINE,WINLOGON_KEY,0,KEY_QUERY_VALUE,&key)) return 0;
     status=RegQueryValueExA(key,"Taskman",NULL,&type,(LPBYTE)value,&size);
     RegCloseKey(key);
     if (status || type!=REG_SZ) return 0;
     value[size]=0;
-    tasklistCommand(command);
-    return !lstrcmpiA(value,command);
+    program=value;
+    while (*program==' ') ++program;
+    separator=' ';
+    if (*program=='"') { separator='"'; ++program; }
+    for (arguments=program;*arguments && *arguments!=separator;++arguments) ;
+    if (*arguments) *arguments++=0;
+    while (*arguments==' ') ++arguments;
+    if (lstrcmpiA(arguments,"/tasklist")) return 0;
+    n=GetModuleFileNameA(NULL,self,MAX_PATH-1);
+    self[n]=0;
+    n=SearchPathA(NULL,program,".exe",MAX_PATH,found,&file);
+    return n && n<MAX_PATH && !lstrcmpiA(found,self);
 }
 static void updateTasklistMenu(void)
 {

@@ -267,6 +267,10 @@ static const char *cpuFormat(DWORD type)
     case 601: case 603: case 604: case 620: return "PowerPC %lu";
     case 2200: return "IA64";
     case 8664: return "x64";
+    /* PROCESSOR_ARM_CORTEX_*: the part number of the MIDR (PINT 3.5) */
+    case 0xC07: return "ARM Cortex-A7";
+    case 0xD03: return "ARM Cortex-A53";
+    case 0xD08: return "ARM Cortex-A72";
     }
     if (type >= 21000 && type < 22000) return "Alpha %lu";
     return "Unknown %lu";
